@@ -14,8 +14,6 @@ venv/
 *.gguf
 
 # Data (download separately from HuggingFace)
-Track A/
-Track B/
 
 # RAG index (built locally)
 rag/index.faiss
