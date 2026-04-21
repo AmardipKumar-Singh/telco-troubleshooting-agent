@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.env
+venv/
+.venv/
+
+# Model weights (too large for git)
+*.bin
+*.safetensors
+*.gguf
+
+# Data (download separately from HuggingFace)
+Track A/
+Track B/
+
+# RAG index (built locally)
+rag/index.faiss
+rag/chunks.json
+
+# Outputs
+result.csv
+traces.json
+
+# IDE
+.vscode/
+.idea/

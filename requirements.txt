@@ -1,0 +1,22 @@
+# Core
+torch>=2.2.0
+transformers>=4.45.0
+accelerate>=0.30.0
+datasets>=2.18.0
+
+# Inference (optional but recommended for speed)
+vllm>=0.4.0
+
+# RAG
+faiss-cpu>=1.8.0
+sentence-transformers>=3.0.0
+
+# Tools / HTTP
+requests>=2.31.0
+httpx>=0.27.0
+
+# Utilities
+peft>=0.11.0
+trl>=0.8.0
+numpy>=1.26.0
+pandas>=2.2.0
