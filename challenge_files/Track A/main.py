@@ -37,7 +37,7 @@ from utils import (
 )
 
 os.environ["NO_PROXY"] = "localhost,127.0.0.1"
-API_KEY = os.environ.get("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", "dummy")
+API_KEY = os.environ.get("AGENT_API_KEY", "dummy")
 
 # ---------------------------------------------------------------------------
 # System prompt — 5G domain knowledge + ReAct instructions
