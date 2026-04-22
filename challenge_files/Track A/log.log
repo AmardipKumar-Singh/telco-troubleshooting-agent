@@ -1,0 +1,1210 @@
+2026-04-21 20:58:47,999 - root - INFO - Starting benchmark: 0 scenarios, 1 attempt(s) each
+2026-04-21 20:58:47,999 - root - INFO - Saved completions.json to ./results/completions.json
+2026-04-21 21:03:19,113 - root - INFO - Starting benchmark: 5 scenarios, 1 attempt(s) each
+2026-04-21 21:03:19,114 - root - INFO - [Scenario 80e3aa96-815d-4683-980c-16db42eab0ef] attempt 1/1
+2026-04-21 21:03:19,118 - root - INFO - [Scenario: 80e3aa96-815d-4683-980c-16db42eab0ef] Round 1
+2026-04-21 21:03:20,070 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:20,078 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:20,078 - root - INFO - [Scenario: 80e3aa96-815d-4683-980c-16db42eab0ef] Round 2
+2026-04-21 21:03:20,138 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:20,143 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:20,143 - root - INFO - [Scenario: 80e3aa96-815d-4683-980c-16db42eab0ef] Round 3
+2026-04-21 21:03:20,179 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:20,181 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:20,182 - root - INFO - [Scenario: 80e3aa96-815d-4683-980c-16db42eab0ef] Round 4
+2026-04-21 21:03:20,215 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:20,216 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:20,216 - root - INFO - [Scenario: 80e3aa96-815d-4683-980c-16db42eab0ef] Round 5
+2026-04-21 21:03:20,248 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:20,250 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:20,250 - root - INFO - [Scenario: 80e3aa96-815d-4683-980c-16db42eab0ef] Round 6
+2026-04-21 21:03:20,287 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:20,288 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:20,288 - root - INFO - [Scenario: 80e3aa96-815d-4683-980c-16db42eab0ef] Round 7
+2026-04-21 21:03:20,319 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:20,320 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:20,320 - root - INFO - [Scenario: 80e3aa96-815d-4683-980c-16db42eab0ef] Round 8
+2026-04-21 21:03:20,353 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:20,354 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:20,354 - root - INFO - [Scenario: 80e3aa96-815d-4683-980c-16db42eab0ef] Round 9
+2026-04-21 21:03:20,386 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:20,388 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:20,388 - root - INFO - [Scenario: 80e3aa96-815d-4683-980c-16db42eab0ef] Round 10
+2026-04-21 21:03:20,420 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:20,422 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:20,422 - root - INFO - [Scenario f55a819f-3fb9-4c8f-8859-a5b1649ff2d5] attempt 1/1
+2026-04-21 21:03:20,425 - root - INFO - [Scenario: f55a819f-3fb9-4c8f-8859-a5b1649ff2d5] Round 1
+2026-04-21 21:03:20,464 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:20,466 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:20,466 - root - INFO - [Scenario: f55a819f-3fb9-4c8f-8859-a5b1649ff2d5] Round 2
+2026-04-21 21:03:20,499 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:20,501 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:20,501 - root - INFO - [Scenario: f55a819f-3fb9-4c8f-8859-a5b1649ff2d5] Round 3
+2026-04-21 21:03:20,537 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:20,539 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:20,539 - root - INFO - [Scenario: f55a819f-3fb9-4c8f-8859-a5b1649ff2d5] Round 4
+2026-04-21 21:03:20,575 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:20,576 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:20,576 - root - INFO - [Scenario: f55a819f-3fb9-4c8f-8859-a5b1649ff2d5] Round 5
+2026-04-21 21:03:20,614 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:20,616 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:20,616 - root - INFO - [Scenario: f55a819f-3fb9-4c8f-8859-a5b1649ff2d5] Round 6
+2026-04-21 21:03:20,666 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:20,668 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:20,668 - root - INFO - [Scenario: f55a819f-3fb9-4c8f-8859-a5b1649ff2d5] Round 7
+2026-04-21 21:03:20,700 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:20,702 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:20,702 - root - INFO - [Scenario: f55a819f-3fb9-4c8f-8859-a5b1649ff2d5] Round 8
+2026-04-21 21:03:20,739 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:20,740 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:20,741 - root - INFO - [Scenario: f55a819f-3fb9-4c8f-8859-a5b1649ff2d5] Round 9
+2026-04-21 21:03:20,778 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:20,779 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:20,779 - root - INFO - [Scenario: f55a819f-3fb9-4c8f-8859-a5b1649ff2d5] Round 10
+2026-04-21 21:03:20,823 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:20,824 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:20,824 - root - INFO - [Scenario 2cd1f674-a411-4860-82c6-a16ba624b172] attempt 1/1
+2026-04-21 21:03:20,827 - root - INFO - [Scenario: 2cd1f674-a411-4860-82c6-a16ba624b172] Round 1
+2026-04-21 21:03:20,859 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:20,861 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:20,861 - root - INFO - [Scenario: 2cd1f674-a411-4860-82c6-a16ba624b172] Round 2
+2026-04-21 21:03:20,898 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:20,899 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:20,899 - root - INFO - [Scenario: 2cd1f674-a411-4860-82c6-a16ba624b172] Round 3
+2026-04-21 21:03:20,932 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:20,934 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:20,934 - root - INFO - [Scenario: 2cd1f674-a411-4860-82c6-a16ba624b172] Round 4
+2026-04-21 21:03:20,971 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:20,973 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:20,973 - root - INFO - [Scenario: 2cd1f674-a411-4860-82c6-a16ba624b172] Round 5
+2026-04-21 21:03:21,008 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:21,010 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:21,010 - root - INFO - [Scenario: 2cd1f674-a411-4860-82c6-a16ba624b172] Round 6
+2026-04-21 21:03:21,048 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:21,050 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:21,050 - root - INFO - [Scenario: 2cd1f674-a411-4860-82c6-a16ba624b172] Round 7
+2026-04-21 21:03:21,081 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:21,083 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:21,083 - root - INFO - [Scenario: 2cd1f674-a411-4860-82c6-a16ba624b172] Round 8
+2026-04-21 21:03:21,114 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:21,115 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:21,115 - root - INFO - [Scenario: 2cd1f674-a411-4860-82c6-a16ba624b172] Round 9
+2026-04-21 21:03:21,147 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:21,148 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:21,148 - root - INFO - [Scenario: 2cd1f674-a411-4860-82c6-a16ba624b172] Round 10
+2026-04-21 21:03:21,190 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:21,194 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:21,194 - root - INFO - [Scenario 923c459f-2ead-4c18-a204-751574ed6ae3] attempt 1/1
+2026-04-21 21:03:21,197 - root - INFO - [Scenario: 923c459f-2ead-4c18-a204-751574ed6ae3] Round 1
+2026-04-21 21:03:21,231 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:21,234 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:21,234 - root - INFO - [Scenario: 923c459f-2ead-4c18-a204-751574ed6ae3] Round 2
+2026-04-21 21:03:21,267 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:21,272 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:21,272 - root - INFO - [Scenario: 923c459f-2ead-4c18-a204-751574ed6ae3] Round 3
+2026-04-21 21:03:21,307 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:21,308 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:21,308 - root - INFO - [Scenario: 923c459f-2ead-4c18-a204-751574ed6ae3] Round 4
+2026-04-21 21:03:21,364 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:21,368 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:21,368 - root - INFO - [Scenario: 923c459f-2ead-4c18-a204-751574ed6ae3] Round 5
+2026-04-21 21:03:21,401 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:21,406 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:21,406 - root - INFO - [Scenario: 923c459f-2ead-4c18-a204-751574ed6ae3] Round 6
+2026-04-21 21:03:21,444 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:21,448 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:21,449 - root - INFO - [Scenario: 923c459f-2ead-4c18-a204-751574ed6ae3] Round 7
+2026-04-21 21:03:21,486 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:21,490 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:21,490 - root - INFO - [Scenario: 923c459f-2ead-4c18-a204-751574ed6ae3] Round 8
+2026-04-21 21:03:21,529 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:21,533 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:21,534 - root - INFO - [Scenario: 923c459f-2ead-4c18-a204-751574ed6ae3] Round 9
+2026-04-21 21:03:21,566 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:21,571 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:21,571 - root - INFO - [Scenario: 923c459f-2ead-4c18-a204-751574ed6ae3] Round 10
+2026-04-21 21:03:21,610 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:21,613 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:21,614 - root - INFO - [Scenario 2e83ae4f-dca0-4931-bb13-d13d672e14e1] attempt 1/1
+2026-04-21 21:03:21,617 - root - INFO - [Scenario: 2e83ae4f-dca0-4931-bb13-d13d672e14e1] Round 1
+2026-04-21 21:03:21,650 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:21,653 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:21,653 - root - INFO - [Scenario: 2e83ae4f-dca0-4931-bb13-d13d672e14e1] Round 2
+2026-04-21 21:03:21,688 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:21,693 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:21,694 - root - INFO - [Scenario: 2e83ae4f-dca0-4931-bb13-d13d672e14e1] Round 3
+2026-04-21 21:03:21,729 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:21,731 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:21,731 - root - INFO - [Scenario: 2e83ae4f-dca0-4931-bb13-d13d672e14e1] Round 4
+2026-04-21 21:03:21,766 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:21,769 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:21,769 - root - INFO - [Scenario: 2e83ae4f-dca0-4931-bb13-d13d672e14e1] Round 5
+2026-04-21 21:03:21,809 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:21,813 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:21,813 - root - INFO - [Scenario: 2e83ae4f-dca0-4931-bb13-d13d672e14e1] Round 6
+2026-04-21 21:03:21,845 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:21,849 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:21,849 - root - INFO - [Scenario: 2e83ae4f-dca0-4931-bb13-d13d672e14e1] Round 7
+2026-04-21 21:03:21,886 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:21,888 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:21,888 - root - INFO - [Scenario: 2e83ae4f-dca0-4931-bb13-d13d672e14e1] Round 8
+2026-04-21 21:03:21,920 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:21,922 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:21,922 - root - INFO - [Scenario: 2e83ae4f-dca0-4931-bb13-d13d672e14e1] Round 9
+2026-04-21 21:03:21,956 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:21,958 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:21,958 - root - INFO - [Scenario: 2e83ae4f-dca0-4931-bb13-d13d672e14e1] Round 10
+2026-04-21 21:03:21,992 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 401 Unauthorized"
+2026-04-21 21:03:21,998 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 272, in _call_model
+    response = self.client.chat.completions.create(**call_kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Missing Authentication header', 'code': 401}}
+
+2026-04-21 21:03:22,005 - root - INFO - Saved result.csv (5/5 scenarios done)
+2026-04-21 21:03:22,005 - root - INFO - Saved completions.json to ./results/completions.json

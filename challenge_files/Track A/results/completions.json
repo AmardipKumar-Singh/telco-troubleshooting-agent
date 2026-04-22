@@ -1,0 +1,67 @@
+[
+  {
+    "scenario_id": "80e3aa96-815d-4683-980c-16db42eab0ef",
+    "free_mode": true,
+    "response": "",
+    "traces": "",
+    "num_iterations": 10,
+    "num_tool_calls": 0,
+    "tool_calls": [],
+    "answers": [],
+    "ground_truth": "To be determined",
+    "accuracy": 0.0,
+    "latency": 1.31
+  },
+  {
+    "scenario_id": "f55a819f-3fb9-4c8f-8859-a5b1649ff2d5",
+    "free_mode": true,
+    "response": "",
+    "traces": "",
+    "num_iterations": 10,
+    "num_tool_calls": 0,
+    "tool_calls": [],
+    "answers": [],
+    "ground_truth": "To be determined",
+    "accuracy": 0.0,
+    "latency": 0.4
+  },
+  {
+    "scenario_id": "2cd1f674-a411-4860-82c6-a16ba624b172",
+    "free_mode": true,
+    "response": "",
+    "traces": "",
+    "num_iterations": 10,
+    "num_tool_calls": 0,
+    "tool_calls": [],
+    "answers": [],
+    "ground_truth": "To be determined",
+    "accuracy": 0.0,
+    "latency": 0.37
+  },
+  {
+    "scenario_id": "923c459f-2ead-4c18-a204-751574ed6ae3",
+    "free_mode": true,
+    "response": "",
+    "traces": "",
+    "num_iterations": 10,
+    "num_tool_calls": 0,
+    "tool_calls": [],
+    "answers": [],
+    "ground_truth": "To be determined",
+    "accuracy": 0.0,
+    "latency": 0.42
+  },
+  {
+    "scenario_id": "2e83ae4f-dca0-4931-bb13-d13d672e14e1",
+    "free_mode": true,
+    "response": "",
+    "traces": "",
+    "num_iterations": 10,
+    "num_tool_calls": 0,
+    "tool_calls": [],
+    "answers": [],
+    "ground_truth": "To be determined",
+    "accuracy": 0.0,
+    "latency": 0.38
+  }
+]
