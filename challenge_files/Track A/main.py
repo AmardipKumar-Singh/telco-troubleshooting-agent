@@ -10,15 +10,22 @@ Key improvements over the baseline main.py:
   4. Parallel-safe tool dispatch (sequential but compact)
   5. Strict answer formatting guard before saving result.csv
   6. Timeout-aware: tracks wall-clock time per scenario, logs discount tier
+  7. [FIX] Switched default model to google/gemma-4-26b-a4b-it:free
+  8. [FIX] Proactive rate limiter (18 req/min) to stay under 20/min free cap
+  9. [FIX] Exponential backoff with 8s base delay for 429s
+ 10. [FIX] None/empty response guard on response.choices before indexing
+ 11. [FIX] Gemma-compatible structured-output system prompt addendum
 """
 
 import argparse
 import json
 import logging
 import os
+import random
+import threading
 import time
 import traceback
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import httpx
 import pandas as pd
@@ -105,6 +112,12 @@ SYSTEM_PROMPT = """You are an expert 5G network troubleshooting engineer with de
 - Multi-answer: \\boxed{C<N>|C<M>} in ascending order
 - NEVER output two boxed answers
 - NEVER output \\boxed{} without a valid C-number inside
+
+## IMPORTANT — Tool Call Format
+When calling a tool, you MUST use the function-calling interface provided.
+Do NOT write tool calls as plain text or JSON in your message content.
+After receiving tool results, reason about them, then either call another tool
+or emit your final \\boxed{} answer.
 """
 
 # ---------------------------------------------------------------------------
@@ -218,6 +231,56 @@ def time_discount(elapsed_seconds: float) -> str:
 
 
 # ---------------------------------------------------------------------------
+# [FIX] Proactive rate limiter — stays under OpenRouter free-tier cap
+# ---------------------------------------------------------------------------
+
+class RateLimiter:
+    """Token-bucket rate limiter. Default: 18 req/min (under Gemma free 20/min cap)."""
+
+    def __init__(self, max_per_minute: int = 18):
+        self.min_interval = 60.0 / max_per_minute
+        self.last_call_time = 0.0
+        self._lock = threading.Lock()
+
+    def wait(self):
+        with self._lock:
+            elapsed = time.time() - self.last_call_time
+            if elapsed < self.min_interval:
+                time.sleep(self.min_interval - elapsed)
+            self.last_call_time = time.time()
+
+# ---------------------------------------------------------------------------
+# [FIX] Model Rotator — in case of persistent 429s, rotate through multiple free models
+# ---------------------------------------------------------------------------
+FREE_MODEL_ROTATION = [
+    "google/gemma-4-26b-a4b-it:free",
+    "meta-llama/llama-4-maverick:free",
+    "mistralai/mistral-small-3.2-24b-instruct:free",
+    "deepseek/deepseek-r1-0528:free",
+    "qwen/qwen3-235b-a22b:free",
+]
+
+class ModelRotator:
+    """Rotates through free models when a provider is saturated."""
+    def __init__(self, models: List[str]):
+        self.models = models
+        self._index = 0
+        self._lock = threading.Lock()
+
+    def current(self) -> str:
+        return self.models[self._index]
+
+    def rotate(self) -> str:
+        with self._lock:
+            self._index = (self._index + 1) % len(self.models)
+            return self.models[self._index]
+
+    def reset(self):
+        with self._lock:
+            self._index = 0
+
+
+# ---------------------------------------------------------------------------
 # AgentsRunner
 # ---------------------------------------------------------------------------
 
@@ -229,10 +292,11 @@ class AgentsRunner:
         model_name: str,
         model_provider: Optional[str] = None,
         max_tokens: int = 16000,
-        max_retries: int = 3,
+        max_retries: int = 6,
         max_iterations: int = 10,
         verbose: bool = False,
         logger: logging.Logger = None,
+        rate_limit_per_minute: int = 18,
     ):
         self.environment = environment
         self.model_url = model_url
@@ -244,6 +308,10 @@ class AgentsRunner:
         self.verbose = verbose
         self.logger = logger if logger is not None else init_logger()
 
+        # [FIX] Proactive throttle — fire before every LLM call
+        self._rate_limiter = RateLimiter(max_per_minute=rate_limit_per_minute)
+        self._rotator = ModelRotator(FREE_MODEL_ROTATION)
+        
         self.client = OpenAI(
             base_url=model_url,
             api_key=API_KEY,
@@ -266,24 +334,63 @@ class AgentsRunner:
             call_kwargs["tools"] = functions
             call_kwargs["tool_choice"] = "auto"
 
-        base_wait = 1.0
+        base_wait = 8.0
+        consecutive_429s = 0
+
         for attempt in range(1, self.max_retries + 1):
+            self._rate_limiter.wait()
+
+            current_model = self._rotator.current()
+            call_kwargs["model"] = current_model
+
             try:
                 response = self.client.chat.completions.create(**call_kwargs)
+
+                if response is None or not response.choices:
+                    self.logger.warning(f"Empty response from {current_model} — retrying")
+                    time.sleep(base_wait)
+                    continue
+
+                self._rotator.reset()
+                consecutive_429s = 0
                 return response.choices[0].message
-            except (RateLimitError, APIConnectionError, APITimeoutError, APIError) as exc:
+
+            except RateLimitError:
+                consecutive_429s += 1
+                if attempt == self.max_retries:
+                    self.logger.error(f"Exhausted all {self.max_retries} retries across models")
+                    return None
+
+                if consecutive_429s >= 2:
+                    next_model = self._rotator.rotate()
+                    self.logger.warning(
+                        f"Provider saturated for {current_model} — rotating to {next_model} "
+                        f"(attempt {attempt}/{self.max_retries})"
+                    )
+                    consecutive_429s = 0
+                    time.sleep(3.0)
+                else:
+                    wait = min(base_wait * (2 ** (attempt - 1)) + random.uniform(0, 1), 60.0)
+                    self.logger.warning(
+                        f"Rate limited on {current_model} (attempt {attempt}/{self.max_retries}). "
+                        f"Waiting {wait:.1f}s..."
+                    )
+                    time.sleep(wait)
+
+            except (APIConnectionError, APITimeoutError, APIError) as exc:
                 if self.verbose:
                     self.logger.error(traceback.format_exc())
                 if hasattr(exc, "status_code") and 400 <= exc.status_code < 500 and exc.status_code != 429:
                     return None
                 if attempt == self.max_retries:
                     return None
-                wait = base_wait * (2 ** (attempt - 1))
-                time.sleep(wait)
+                time.sleep(min(base_wait * (2 ** (attempt - 1)), 60.0))
+
             except Exception:
                 if self.verbose:
                     self.logger.error(traceback.format_exc())
                 return None
+
         return None
 
     def _force_answer(
@@ -319,8 +426,16 @@ class AgentsRunner:
 
         tool_defs = self.environment.get_tools()
         if not tool_defs:
-            return {"scenario_id": scenario_id, "status": "unresolved", "reason": "No tools available",
-                    "answer": "", "traces": "", "tool_calls": [], "num_tool_calls": 0, "num_iterations": 0}
+            return {
+                "scenario_id": scenario_id,
+                "status": "unresolved",
+                "reason": "No tools available",
+                "answer": "",
+                "traces": "",
+                "tool_calls": [],
+                "num_tool_calls": 0,
+                "num_iterations": 0,
+            }
 
         question = description + f"\nOptions:\n{root_causes}"
 
@@ -340,6 +455,7 @@ class AgentsRunner:
 
             msg = self._call_model(messages, functions=tool_defs)
             if msg is None:
+                self.logger.warning(f"[Scenario: {scenario_id}] _call_model returned None at round {i+1} — skipping")
                 continue
 
             last_msg = msg
@@ -524,7 +640,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Track A — Enhanced ReAct Agent")
     parser.add_argument("--server_url", type=str, default="http://localhost:7860")
     parser.add_argument("--model_url", type=str, default="https://openrouter.ai/api/v1")
-    parser.add_argument("--model_name", type=str, default="qwen/qwen3.5-35b-a3b")
+    # [FIX] Default model changed to Gemma 4 26B A4B free — 20 req/min, 262K context, 7 providers
+    parser.add_argument("--model_name", type=str, default="google/gemma-4-26b-a4b-it:free")
     parser.add_argument("--model_provider", type=str, default=None)
     parser.add_argument("--num_attempts", type=int, default=1)
     parser.add_argument("--max_samples", type=int, default=None)
@@ -533,6 +650,9 @@ if __name__ == "__main__":
     parser.add_argument("--max_iterations", type=int, default=10)
     parser.add_argument("--save_dir", type=str, default="./results")
     parser.add_argument("--log_file", type=str, default="./log.log")
+    # [FIX] Exposed rate limit as CLI arg — set lower if still hitting 429s
+    parser.add_argument("--rate_limit_per_minute", type=int, default=18,
+                        help="Max LLM requests per minute (default 18, under Gemma free 20/min cap)")
     parser.add_argument("--no_free_mode", action="store_true", help="Disable free_mode (not recommended)")
     parser.add_argument("--verbose", action="store_true")
     args = parser.parse_args()
@@ -550,6 +670,7 @@ if __name__ == "__main__":
         max_iterations=args.max_iterations,
         verbose=args.verbose,
         logger=logger,
+        rate_limit_per_minute=args.rate_limit_per_minute,
     )
 
     runner.benchmark(
