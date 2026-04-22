@@ -325,7 +325,6 @@ class AgentsRunner:
 
     def _call_model(self, messages: List[Dict], functions: List[Dict], **kwargs):
         call_kwargs = {
-            "model": self._model_name_str(),
             "messages": messages,
             "max_tokens": self.max_tokens,
             **kwargs,

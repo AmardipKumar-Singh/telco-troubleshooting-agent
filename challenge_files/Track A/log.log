@@ -5868,3 +5868,30 @@ openai.RateLimitError: Error code: 429 - {'error': {'message': 'Rate limit excee
 openai.RateLimitError: Error code: 429 - {'error': {'message': 'Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day', 'code': 429, 'metadata': {'headers': {'X-RateLimit-Limit': '50', 'X-RateLimit-Remaining': '0', 'X-RateLimit-Reset': '1776902400000'}, 'provider_name': None}}, 'user_id': 'user_3CgrODAYo4ywlKBSTLKjf9WnUm8'}
 
 2026-04-21 22:03:32,971 - root - WARNING - Rate limited (attempt 4/6). Waiting 64.2s before retry...
+2026-04-21 22:04:37,444 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-04-21 22:04:37,445 - openai._base_client - INFO - Retrying request to /chat/completions in 0.400657 seconds
+2026-04-21 22:04:37,949 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-04-21 22:04:37,950 - openai._base_client - INFO - Retrying request to /chat/completions in 0.938188 seconds
+2026-04-21 22:04:39,002 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2026-04-21 22:04:39,009 - root - ERROR - Traceback (most recent call last):
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/challenge_files/Track A/main.py", line 314, in _call_model
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_utils/_utils.py", line 287, in wrapper
+    return func(*args, **kwargs)
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/resources/chat/completions/completions.py", line 1211, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<47 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1314, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/amardip/telco_agent/telco-troubleshooting-agent/.venv/lib/python3.13/site-packages/openai/_base_client.py", line 1087, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.RateLimitError: Error code: 429 - {'error': {'message': 'Rate limit exceeded: free-models-per-day. Add 10 credits to unlock 1000 free model requests per day', 'code': 429, 'metadata': {'headers': {'X-RateLimit-Limit': '50', 'X-RateLimit-Remaining': '0', 'X-RateLimit-Reset': '1776902400000'}, 'provider_name': None}}, 'user_id': 'user_3CgrODAYo4ywlKBSTLKjf9WnUm8'}
+
+2026-04-21 22:04:39,009 - root - WARNING - Rate limited (attempt 5/6). Waiting 120.0s before retry...
