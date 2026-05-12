@@ -3,20 +3,14 @@
 """
 Track A — Enhanced ReAct Agent for 5G Drive-Test Troubleshooting
 =================================================================
-Key improvements:
-  1. Rich system prompt with 5G domain knowledge and decision heuristics
-  2. free_mode=True by default (forces boxed answer extraction)
-  3. Early-stopping: once answer is extracted with high confidence, stop
-  4. Parallel-safe tool dispatch (sequential but compact)
-  5. Strict answer formatting guard before saving result.csv
-  6. Timeout-aware: tracks wall-clock time per scenario, logs discount tier
-  7. [FIX] Primary model: qwen/qwen3.6-plus:free (1M ctx, Qwen flagship May 2026)
-  8. [FIX] Proactive rate limiter (18 req/min) under free 20/min cap
-  9. [FIX] Exponential backoff with 8s base delay for 429s
- 10. [FIX] None/empty response guard on response.choices before indexing
- 11. [FIX] Server health-check on startup — clear error if server not running
- 12. [FIX] Model rotation fallback: Gemma4 -> Llama4 -> Mistral -> DeepSeek
- 13. [FIX] 404 NotFoundError caught and triggers immediate model rotation
+Fixes in this version:
+  - Primary model: qwen/qwen3-coder:free (strongest free Qwen, Tools, 262K ctx)
+  - Rotation list: 7 models confirmed active with Tools support (May 2026)
+  - 200 req/day per-model budget guard — rotates before hitting daily cap
+  - max_retries=0 on OpenAI client — prevents duplicate retry logs
+  - NotFoundError rotates immediately without looping
+  - Rate limiter default: 15 req/min (safe under 20/min free cap)
+  - save_freq=5 for more frequent checkpointing
 """
 
 import argparse
@@ -28,12 +22,15 @@ import sys
 import threading
 import time
 import traceback
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 import httpx
 import pandas as pd
 import requests
-from openai import OpenAI, RateLimitError, APIConnectionError, APITimeoutError, APIError, NotFoundError
+from openai import (
+    OpenAI, RateLimitError, APIConnectionError,
+    APITimeoutError, APIError, NotFoundError
+)
 
 from _types import ToolCall
 from logger import init_logger
@@ -50,7 +47,7 @@ os.environ["NO_PROXY"] = "localhost,127.0.0.1"
 API_KEY = os.environ.get("AGENT_API_KEY", "dummy")
 
 # ---------------------------------------------------------------------------
-# System prompt — 5G domain knowledge + ReAct instructions
+# System prompt
 # ---------------------------------------------------------------------------
 
 SYSTEM_PROMPT = """You are an expert 5G network troubleshooting engineer with deep knowledge of:
@@ -73,7 +70,6 @@ SYSTEM_PROMPT = """You are an expert 5G network troubleshooting engineer with de
 2. **Interference / SINR problem**:
    - Symptom: SINR < 0 dB during degradation, strong interfering neighbour visible
    - Check if neighbour RSRP > serving RSRP by >= (A3Offset + A3Hyst) in dB
-   - If difference exactly equals threshold (not strictly greater) -> HO not triggered
    - Fix: Decrease A3 Offset for serving cell OR decrease tilt to shrink overlap
 
 3. **Coverage hole**:
@@ -82,7 +78,7 @@ SYSTEM_PROMPT = """You are an expert 5G network troubleshooting engineer with de
 
 4. **Overloaded cell**:
    - Symptom: high PRB utilisation, throughput capped despite good RSRP/SINR
-   - Fix: inter-freq offload (lower A2/A5 thresholds), DO NOT increase load further
+   - Fix: inter-freq offload (lower A2/A5 thresholds)
 
 5. **Missing neighbour relation**:
    - Symptom: UE in coverage of cell not in neighbour list, handover fails
@@ -90,37 +86,30 @@ SYSTEM_PROMPT = """You are an expert 5G network troubleshooting engineer with de
 
 6. **Azimuth / tilt misalignment**:
    - Use calculate_horizontal_angle and judge_mainlobe_or_not tools
-   - If UE is outside main-lobe -> adjust azimuth
-   - If overlap too large -> press down tilt
+   - If UE outside main-lobe -> adjust azimuth; if overlap too large -> press down tilt
 
 7. **PDCCH overhead**:
-   - PdcchOccupiedSymbolNum 2SYM reduces user-plane throughput
    - Only recommend 1SYM->2SYM if scheduling bottleneck confirmed
 
 8. **Test server / transmission issue**:
-   - Recommend C_check_server only if ALL cells in area show degradation simultaneously
-   - Otherwise always diagnose radio first
+   - Recommend C_check_server only if ALL cells show degradation simultaneously
 
 ## ReAct Protocol
-- ALWAYS start with get_throughput_logs to identify the degradation window
-- Then get_serving_cell_pci at the worst throughput timestamp
+- ALWAYS start with get_throughput_logs to find the degradation window
+- Then get_serving_cell_pci at worst throughput timestamp
 - Then get_cell_info for that PCI
 - Then get_serving_cell_rsrp and get_serving_cell_sinr at degradation time
-- If SINR is poor -> get_neighboring_cells_pci -> get_neighboring_cell_rsrp for each
-- Use geometry tools (calculate_horizontal_angle, judge_mainlobe_or_not) when azimuth/tilt is suspected
-- Stop calling tools once root cause is confirmed — do not make unnecessary calls
+- If SINR poor -> get_neighboring_cells_pci -> get_neighboring_cell_rsrp for each
+- Use geometry tools when azimuth/tilt suspected
+- Stop calling tools once root cause confirmed
 
 ## Answer Format
-- Single-answer: \\boxed{C<N>}
-- Multi-answer: \\boxed{C<N>|C<M>} in ascending order, e.g. \\boxed{C3|C7}
-- NEVER output two separate boxed answers
-- NEVER output \\boxed{} without a valid C-number inside
+- Single: \\boxed{C<N>}
+- Multi: \\boxed{C<N>|C<M>} ascending order
+- NEVER two boxed answers; NEVER empty \\boxed{}
 
-## IMPORTANT — Tool Call Format
-When calling a tool, you MUST use the function-calling interface provided.
-Do NOT write tool calls as plain text or JSON in your message content.
-After receiving tool results, reason about them, then either call another tool
-or emit your final \\boxed{} answer.
+## Tool Call Format
+Use the function-calling interface ONLY. Do NOT write tool calls as plain text.
 """
 
 # ---------------------------------------------------------------------------
@@ -156,18 +145,11 @@ class Environment:
         "optimize_antenna_gain": "/optimize_antenna_gain",
     }
 
-    def __init__(
-        self,
-        server_url: str,
-        verbose: bool = False,
-        log_file: Optional[str] = None,
-        timeout: float = 15.0,
-        logger: logging.Logger = None,
-    ):
+    def __init__(self, server_url, verbose=False, log_file=None, timeout=15.0, logger=None):
         self.server_url = server_url.rstrip("/")
         self.verbose = verbose
         self.timeout = timeout
-        self.logger = logger if logger is not None else init_logger()
+        self.logger = logger or init_logger()
 
     def health_check(self) -> bool:
         url = f"{self.server_url}/health"
@@ -176,33 +158,25 @@ class Environment:
             if resp.status_code == 200:
                 self.logger.info(f"Tool Server health check PASSED: {url}")
                 return True
-            else:
-                self.logger.error(
-                    f"Tool Server health check FAILED (HTTP {resp.status_code}): {url}\n"
-                    f"Start: cd 'challenge_files/Track A' && python -m uvicorn server:app --host 0.0.0.0 --port 7860"
-                )
-                return False
+            self.logger.error(f"Health check FAILED (HTTP {resp.status_code}): {url}")
+            return False
         except Exception as e:
-            self.logger.error(
-                f"Tool Server NOT reachable at {url}: {e}\n"
-                f"Start: python -m uvicorn server:app --host 0.0.0.0 --port 7860"
-            )
+            self.logger.error(f"Tool Server NOT reachable at {url}: {e}")
             return False
 
-    def _headers(self, scenario_id: Optional[str] = None) -> Dict[str, str]:
-        headers = {"Content-Type": "application/json"}
+    def _headers(self, scenario_id=None):
+        h = {"Content-Type": "application/json"}
         if scenario_id:
-            headers["X-Scenario-Id"] = scenario_id
-        return headers
+            h["X-Scenario-Id"] = scenario_id
+        return h
 
-    def _call_api(self, function_name: str, scenario_id: Optional[str] = None, **params) -> Dict:
+    def _call_api(self, function_name, scenario_id=None, **params):
         endpoint = self.endpoint_mapper.get(function_name)
         if endpoint is None:
             return {"error": f"Unknown tool '{function_name}'"}
         url = f"{self.server_url}{endpoint}"
-        headers = self._headers(scenario_id=scenario_id)
         try:
-            resp = requests.get(url, params=params, headers=headers, timeout=self.timeout)
+            resp = requests.get(url, params=params, headers=self._headers(scenario_id), timeout=self.timeout)
             resp.raise_for_status()
             return resp.json()
         except requests.exceptions.HTTPError:
@@ -228,7 +202,7 @@ class Environment:
             return []
         return scenarios if isinstance(scenarios, list) else []
 
-    def execute(self, tool_call: ToolCall, scenario_id: Optional[str] = None) -> str:
+    def execute(self, tool_call: ToolCall, scenario_id=None) -> str:
         try:
             function_name = tool_call.function.name
             arguments = json.loads(tool_call.function.arguments or "{}")
@@ -241,28 +215,19 @@ class Environment:
 
 
 # ---------------------------------------------------------------------------
-# Discount helper
+# Helpers
 # ---------------------------------------------------------------------------
 
 def time_discount(elapsed_seconds: float) -> str:
-    if elapsed_seconds < 300:
-        return "100%"
-    elif elapsed_seconds < 600:
-        return "80%"
-    elif elapsed_seconds < 900:
-        return "60%"
-    else:
-        return "0% (TIMED OUT)"
+    if elapsed_seconds < 300: return "100%"
+    elif elapsed_seconds < 600: return "80%"
+    elif elapsed_seconds < 900: return "60%"
+    else: return "0% (TIMED OUT)"
 
-
-# ---------------------------------------------------------------------------
-# Proactive rate limiter
-# ---------------------------------------------------------------------------
 
 class RateLimiter:
-    """Token-bucket rate limiter. Default: 18 req/min (under free 20/min cap)."""
-
-    def __init__(self, max_per_minute: int = 18):
+    """Proactive token-bucket rate limiter."""
+    def __init__(self, max_per_minute: int = 15):
         self.min_interval = 60.0 / max_per_minute
         self.last_call_time = 0.0
         self._lock = threading.Lock()
@@ -277,34 +242,47 @@ class RateLimiter:
 
 # ---------------------------------------------------------------------------
 # Model Rotator
-# Primary: qwen/qwen3.6-plus:free  (ITU Qwen suggestion, 1M ctx, free May 2026)
-# Fallbacks in order if 404/429 encountered
+# All 7 models confirmed active with Tools support on OpenRouter (May 2026)
+# Free tier: 20 req/min AND 200 req/day per model
+# 7 models x 200 req/day = 1400 req/day — covers 500 scenarios (~2-3 calls each)
 # ---------------------------------------------------------------------------
 FREE_MODEL_ROTATION = [
-    "qwen/qwen3.6-plus:free",                             # primary
-    "google/gemma-4-26b-a4b-it:free",                    # fallback 1
-    "meta-llama/llama-4-maverick:free",                  # fallback 2
-    "mistralai/mistral-small-3.2-24b-instruct:free",     # fallback 3
-    "deepseek/deepseek-r1-0528:free",                    # fallback 4
+    "qwen/qwen3-coder:free",                          # primary: 480B MoE, 262K ctx
+    "google/gemma-4-31b-it:free",                     # fallback 1: Gemma4 31B, 262K
+    "google/gemma-4-26b-a4b-it:free",                 # fallback 2: Gemma4 26B, 262K
+    "nvidia/nemotron-3-super-120b-a12b:free",         # fallback 3: NVIDIA 120B, 262K
+    "openai/gpt-oss-120b:free",                       # fallback 4: GPT-OSS 120B, 131K
+    "meta-llama/llama-3.3-70b-instruct:free",         # fallback 5: Llama 3.3 70B, 66K
+    "qwen/qwen3-next-80b-a3b-instruct:free",          # fallback 6: Qwen3 Next 80B, 262K
 ]
 
+DAILY_BUDGET_PER_MODEL = 180  # conservative under 200/day hard limit
+
+
 class ModelRotator:
-    def __init__(self, models: List[str]):
+    def __init__(self, models: List[str], daily_budget: int = 180):
         self.models = models
+        self.daily_budget = daily_budget
         self._index = 0
+        self._call_counts = {m: 0 for m in models}
         self._lock = threading.Lock()
 
     def current(self) -> str:
         return self.models[self._index]
 
+    def record_success(self):
+        """Count successful calls; auto-rotate if approaching daily cap."""
+        with self._lock:
+            m = self.models[self._index]
+            self._call_counts[m] += 1
+            if self._call_counts[m] >= self.daily_budget:
+                self._index = (self._index + 1) % len(self.models)
+                self._call_counts[self.models[self._index]] = 0  # reset new model count
+
     def rotate(self) -> str:
         with self._lock:
             self._index = (self._index + 1) % len(self.models)
             return self.models[self._index]
-
-    def reset(self):
-        with self._lock:
-            self._index = 0
 
 
 # ---------------------------------------------------------------------------
@@ -323,7 +301,7 @@ class AgentsRunner:
         max_iterations: int = 10,
         verbose: bool = False,
         logger: logging.Logger = None,
-        rate_limit_per_minute: int = 18,
+        rate_limit_per_minute: int = 15,
     ):
         self.environment = environment
         self.model_url = model_url
@@ -333,90 +311,78 @@ class AgentsRunner:
         self.max_retries = max_retries
         self.max_iterations = max_iterations
         self.verbose = verbose
-        self.logger = logger if logger is not None else init_logger()
-
+        self.logger = logger or init_logger()
         self._rate_limiter = RateLimiter(max_per_minute=rate_limit_per_minute)
-        self._rotator = ModelRotator(FREE_MODEL_ROTATION)
-
+        self._rotator = ModelRotator(FREE_MODEL_ROTATION, daily_budget=DAILY_BUDGET_PER_MODEL)
         self.client = OpenAI(
             base_url=model_url,
             api_key=API_KEY,
             http_client=httpx.Client(verify=False),
+            max_retries=0,  # we handle all retries ourselves — prevents duplicate calls
         )
 
     def _call_model(self, messages: List[Dict], functions: List[Dict], **kwargs):
-        call_kwargs = {
-            "messages": messages,
-            "max_tokens": self.max_tokens,
-            **kwargs,
-        }
+        call_kwargs = {"messages": messages, "max_tokens": self.max_tokens, **kwargs}
         if functions:
             call_kwargs["tools"] = functions
             call_kwargs["tool_choice"] = "auto"
 
         base_wait = 8.0
-        consecutive_404s = 0
         consecutive_429s = 0
+        models_tried = set()
 
         for attempt in range(1, self.max_retries + 1):
             self._rate_limiter.wait()
-
             current_model = self._rotator.current()
             call_kwargs["model"] = current_model
 
             try:
                 response = self.client.chat.completions.create(**call_kwargs)
-
                 if response is None or not response.choices:
                     self.logger.warning(f"Empty response from {current_model} — retrying")
                     time.sleep(base_wait)
                     continue
 
-                self._rotator.reset()
+                self._rotator.record_success()
                 consecutive_429s = 0
-                consecutive_404s = 0
                 return response.choices[0].message
 
             except NotFoundError:
-                # Model has no active endpoints — rotate immediately
+                models_tried.add(current_model)
                 next_model = self._rotator.rotate()
-                self.logger.warning(
-                    f"404 No endpoints for {current_model} — rotating to {next_model}"
-                )
-                consecutive_404s += 1
-                if consecutive_404s >= len(FREE_MODEL_ROTATION):
-                    self.logger.error("All models returned 404. Check OpenRouter model availability.")
+                self.logger.warning(f"404 No endpoints for {current_model} — rotating to {next_model}")
+                if len(models_tried) >= len(FREE_MODEL_ROTATION):
+                    self.logger.error("All models in rotation returned 404. No active free models.")
                     return None
-                time.sleep(2.0)
+                time.sleep(1.0)
                 continue
 
             except RateLimitError:
                 consecutive_429s += 1
-                if attempt == self.max_retries:
-                    self.logger.error(f"Exhausted all {self.max_retries} retries")
-                    return None
                 if consecutive_429s >= 2:
                     next_model = self._rotator.rotate()
-                    self.logger.warning(
-                        f"Provider saturated for {current_model} — rotating to {next_model}"
-                    )
+                    self.logger.warning(f"429 saturated on {current_model} — rotating to {next_model}")
                     consecutive_429s = 0
                     time.sleep(3.0)
                 else:
                     wait = min(base_wait * (2 ** (attempt - 1)) + random.uniform(0, 1), 60.0)
-                    self.logger.warning(
-                        f"Rate limited on {current_model} (attempt {attempt}/{self.max_retries}). "
-                        f"Waiting {wait:.1f}s..."
-                    )
+                    self.logger.warning(f"Rate limited on {current_model} (attempt {attempt}/{self.max_retries}). Waiting {wait:.1f}s...")
                     time.sleep(wait)
+                if attempt == self.max_retries:
+                    self.logger.error(f"Exhausted all {self.max_retries} retries")
+                    return None
 
-            except (APIConnectionError, APITimeoutError, APIError) as exc:
-                if self.verbose:
-                    self.logger.error(traceback.format_exc())
-                if hasattr(exc, "status_code") and 400 <= exc.status_code < 500 and exc.status_code != 429:
+            except (APIConnectionError, APITimeoutError):
+                if attempt == self.max_retries:
+                    return None
+                time.sleep(min(base_wait * (2 ** (attempt - 1)), 60.0))
+
+            except APIError as exc:
+                status = getattr(exc, "status_code", None)
+                if status and 400 <= status < 500 and status != 429:
                     next_model = self._rotator.rotate()
-                    self.logger.warning(f"HTTP {exc.status_code} on {current_model} — rotating to {next_model}")
-                    time.sleep(2.0)
+                    self.logger.warning(f"HTTP {status} on {current_model} — rotating to {next_model}")
+                    time.sleep(1.0)
                     continue
                 if attempt == self.max_retries:
                     return None
@@ -429,18 +395,17 @@ class AgentsRunner:
 
         return None
 
-    def _force_answer(self, messages: List[Dict], root_causes: str, is_multi: bool) -> Any:
+    def _force_answer(self, messages: List[Dict], root_causes: str, is_multi: bool):
         if is_multi:
             constraint = (
-                "This is a MULTIPLE-answer question. Select two to four optimisation options. "
-                "Output ONLY a single \\boxed{} with answers separated by | in ascending order. "
-                f"Example: \\boxed{{C3|C7}}\n\nOptions:\n{root_causes}"
+                "MULTIPLE-answer question. Select 2-4 options. "
+                "Output ONLY \\boxed{C<N>|C<M>} ascending. Example: \\boxed{C3|C7}\n"
+                f"Options:\n{root_causes}"
             )
         else:
             constraint = (
-                "This is a SINGLE-answer question. Select the single best optimisation option. "
-                "Output ONLY a single \\boxed{{}} with one answer. "
-                f"Example: \\boxed{{C9}}\n\nOptions:\n{root_causes}"
+                "SINGLE-answer question. Output ONLY \\boxed{C<N>}. Example: \\boxed{C5}\n"
+                f"Options:\n{root_causes}"
             )
         messages.append({"role": "user", "content": constraint})
         return self._call_model(messages, functions=[])
@@ -450,7 +415,6 @@ class AgentsRunner:
         task = scenario.get("task", {})
         options = task.get("options", [])
         root_causes = "".join([f"{item['id']}:{item['label']}\n" for item in options])
-
         description = task.get("description", "")
         is_multi = "select" in description.lower() and any(
             kw in description.lower() for kw in ["two", "three", "four", "multiple", "2", "3", "4"]
@@ -458,24 +422,16 @@ class AgentsRunner:
 
         tool_defs = self.environment.get_tools()
         if not tool_defs:
-            self.logger.error(
-                f"[Scenario: {scenario_id}] No tools returned. Is the Tool Server running?"
-            )
+            self.logger.error(f"[Scenario: {scenario_id}] No tools returned. Is the Tool Server running?")
             return {
-                "scenario_id": scenario_id,
-                "status": "unresolved",
-                "reason": "No tools available — Tool Server may be down",
-                "answer": "",
-                "traces": "",
-                "tool_calls": [],
-                "num_tool_calls": 0,
-                "num_iterations": 0,
+                "scenario_id": scenario_id, "status": "unresolved",
+                "reason": "No tools available", "answer": "", "traces": "",
+                "tool_calls": [], "num_tool_calls": 0, "num_iterations": 0,
             }
 
-        question = description + f"\nOptions:\n{root_causes}"
         messages: List[Dict] = [
             {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": question},
+            {"role": "user", "content": description + f"\nOptions:\n{root_causes}"},
         ]
 
         num_tool_calls = 0
@@ -485,19 +441,14 @@ class AgentsRunner:
         i = 0
 
         for i in range(self.max_iterations):
-            self.logger.info(f"[Scenario: {scenario_id}] Round {i + 1}")
-
+            self.logger.info(f"[Scenario: {scenario_id}] Round {i + 1} (model: {self._rotator.current()})")
             msg = self._call_model(messages, functions=tool_defs)
             if msg is None:
                 self.logger.warning(f"[Scenario: {scenario_id}] _call_model returned None at round {i+1}")
                 continue
 
             last_msg = msg
-            messages.append({
-                "role": "assistant",
-                "content": msg.content or "",
-                "tool_calls": msg.tool_calls,
-            })
+            messages.append({"role": "assistant", "content": msg.content or "", "tool_calls": msg.tool_calls})
 
             if self.verbose:
                 print_model_response(msg, logger=self.logger, minimize=False)
@@ -514,32 +465,26 @@ class AgentsRunner:
                     list_tool_calls.append({
                         "function_name": tool_call.function.name,
                         "arguments": tool_call.function.arguments,
-                        "turn": i + 1,
-                        "order": j + 1,
+                        "turn": i + 1, "order": j + 1,
                         "has_failed": "error" in tool_result,
                         "results": tool_result,
                     })
-                if msg.content:
-                    early = extract_answer_all(msg.content)
-                    if early:
-                        self.logger.info(f"[Scenario: {scenario_id}] Early answer: {early}")
-                        status = "solved"
-                        break
+                if msg.content and extract_answer_all(msg.content):
+                    status = "solved"
+                    break
             elif msg.content:
-                answer_candidate = extract_answer_all(msg.content)
-                if answer_candidate:
+                if extract_answer_all(msg.content):
+                    status = "solved"
+                    break
+                elif free_mode:
+                    forced = self._force_answer(messages, root_causes, is_multi)
+                    if forced is not None:
+                        last_msg = forced
                     status = "solved"
                     break
                 else:
-                    if free_mode:
-                        forced = self._force_answer(messages, root_causes, is_multi)
-                        if forced is not None:
-                            last_msg = forced
-                        status = "solved"
-                        break
-                    else:
-                        status = "solved"
-                        break
+                    status = "solved"
+                    break
             else:
                 status = "unresolved"
                 break
@@ -549,9 +494,8 @@ class AgentsRunner:
 
         final_content = getattr(last_msg, "content", "") or ""
         final_traces = getattr(last_msg, "reasoning_content", "") or ""
-        agent_answer = extract_answer_all(final_content) or extract_answer_all(final_traces)
 
-        if not agent_answer and free_mode and last_msg is not None:
+        if not extract_answer_all(final_content) and free_mode and last_msg is not None:
             self.logger.info(f"[Scenario: {scenario_id}] No boxed answer — forcing final prompt")
             forced = self._force_answer(messages, root_causes, is_multi)
             if forced is not None:
@@ -572,11 +516,8 @@ class AgentsRunner:
         }
 
     def benchmark(
-        self,
-        num_attempts: int,
-        save_dir: str,
-        save_freq: int = 10,
-        max_samples: Optional[int] = None,
+        self, num_attempts: int, save_dir: str,
+        save_freq: int = 5, max_samples: Optional[int] = None,
         free_mode: bool = True,
     ) -> None:
         os.makedirs(save_dir, exist_ok=True)
@@ -585,7 +526,7 @@ class AgentsRunner:
 
         scenarios = self.environment.get_scenarios()
         if max_samples is not None:
-            scenarios = scenarios[: min(max_samples, len(scenarios))]
+            scenarios = scenarios[:min(max_samples, len(scenarios))]
 
         self.logger.info(f"Starting benchmark: {len(scenarios)} scenarios, {num_attempts} attempt(s) each")
 
@@ -609,23 +550,16 @@ class AgentsRunner:
                     score = compute_score(agent_answer, ground_truth)
                     n_success += score
                     agent_answers.append(agent_answer)
-
                     elapsed = time.time() - start_time
-                    discount = time_discount(elapsed)
-                    pink = "\033[95m"
-                    reset = "\033[0m"
                     self.logger.info(
-                        f"{pink}[Scenario: {scenario_id}] answer={agent_answer} | "
+                        f"\033[95m[Scenario: {scenario_id}] answer={agent_answer} | "
                         f"gt={ground_truth} | score={score:.2f} | "
-                        f"time={elapsed:.1f}s | discount={discount}{reset}"
+                        f"time={elapsed:.1f}s | discount={time_discount(elapsed)}\033[0m"
                     )
 
-            acc = n_success / float(num_attempts)
             latency = round((time.time() - start_time) / float(num_attempts), 2)
-
             completions.append({
                 "scenario_id": scenario_id,
-                "free_mode": free_mode,
                 "response": sample_response.get("answer", ""),
                 "traces": sample_response.get("traces", ""),
                 "num_iterations": sample_response.get("num_iterations", 0),
@@ -633,24 +567,21 @@ class AgentsRunner:
                 "tool_calls": sample_response.get("tool_calls", []),
                 "answers": agent_answers,
                 "ground_truth": scenario.get("answer"),
-                "accuracy": acc,
+                "accuracy": n_success / float(num_attempts),
                 "latency": latency,
             })
-
             save_result.append({
                 "scenario_id": scenario_id,
                 "answers": agent_answers[0] if agent_answers else "",
             })
 
             if ((idx + 1) % save_freq == 0) or ((idx + 1) == len(scenarios)):
-                df = pd.DataFrame(save_result)
-                df.to_csv(os.path.join(save_dir, "result.csv"), index=False)
-                self.logger.info(f"Saved result.csv ({idx + 1}/{len(scenarios)} scenarios done)")
+                pd.DataFrame(save_result).to_csv(os.path.join(save_dir, "result.csv"), index=False)
+                self.logger.info(f"Saved result.csv ({idx + 1}/{len(scenarios)} done)")
 
-        completions_path = os.path.join(save_dir, "completions.json")
-        with open(completions_path, "w", encoding="utf-8") as f:
+        with open(os.path.join(save_dir, "completions.json"), "w", encoding="utf-8") as f:
             json.dump(completions, f, ensure_ascii=False, indent=2)
-        self.logger.info(f"Saved completions.json to {completions_path}")
+        self.logger.info("Saved completions.json")
 
 
 # ---------------------------------------------------------------------------
@@ -658,19 +589,19 @@ class AgentsRunner:
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Track A — ReAct Agent (Qwen3.6-Plus primary)")
+    parser = argparse.ArgumentParser(description="Track A — ReAct Agent")
     parser.add_argument("--server_url", type=str, default="http://localhost:7860")
     parser.add_argument("--model_url", type=str, default="https://openrouter.ai/api/v1")
-    parser.add_argument("--model_name", type=str, default="qwen/qwen3.6-plus:free")
+    parser.add_argument("--model_name", type=str, default="qwen/qwen3-coder:free")
     parser.add_argument("--model_provider", type=str, default=None)
     parser.add_argument("--num_attempts", type=int, default=1)
     parser.add_argument("--max_samples", type=int, default=None)
-    parser.add_argument("--save_freq", type=int, default=10)
+    parser.add_argument("--save_freq", type=int, default=5)
     parser.add_argument("--max_tokens", type=int, default=16000)
     parser.add_argument("--max_iterations", type=int, default=10)
     parser.add_argument("--save_dir", type=str, default="./results")
     parser.add_argument("--log_file", type=str, default="./log.log")
-    parser.add_argument("--rate_limit_per_minute", type=int, default=18)
+    parser.add_argument("--rate_limit_per_minute", type=int, default=15)
     parser.add_argument("--no_free_mode", action="store_true")
     parser.add_argument("--verbose", action="store_true")
     args = parser.parse_args()
