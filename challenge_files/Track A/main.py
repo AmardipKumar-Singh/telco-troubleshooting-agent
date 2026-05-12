@@ -3,18 +3,19 @@
 """
 Track A — Enhanced ReAct Agent for 5G Drive-Test Troubleshooting
 =================================================================
-Key improvements over the baseline main.py:
+Key improvements:
   1. Rich system prompt with 5G domain knowledge and decision heuristics
   2. free_mode=True by default (forces boxed answer extraction)
   3. Early-stopping: once answer is extracted with high confidence, stop
   4. Parallel-safe tool dispatch (sequential but compact)
   5. Strict answer formatting guard before saving result.csv
   6. Timeout-aware: tracks wall-clock time per scenario, logs discount tier
-  7. [FIX] Switched default model to google/gemma-4-26b-a4b-it:free
-  8. [FIX] Proactive rate limiter (18 req/min) to stay under 20/min free cap
+  7. [FIX] Primary model: qwen/qwen3-235b-a22b:free (ITU-suggested)
+  8. [FIX] Proactive rate limiter (9 req/min) under Qwen3 free 10/min cap
   9. [FIX] Exponential backoff with 8s base delay for 429s
  10. [FIX] None/empty response guard on response.choices before indexing
- 11. [FIX] Gemma-compatible structured-output system prompt addendum
+ 11. [FIX] Server health-check on startup — clear error if server not running
+ 12. [FIX] Model rotation fallback: Gemma -> Llama4 -> Mistral -> DeepSeek
 """
 
 import argparse
@@ -22,6 +23,7 @@ import json
 import logging
 import os
 import random
+import sys
 import threading
 import time
 import traceback
@@ -64,13 +66,13 @@ SYSTEM_PROMPT = """You are an expert 5G network troubleshooting engineer with de
 1. **Late / missed handover** (most common):
    - Symptom: throughput drops while UE stays on same serving cell (PCI unchanged)
    - Neighbour RSRP > Serving RSRP + A3Offset(0.5dB units / 2) + A3Hyst(0.5dB units / 2)
-   - But handover NOT triggered → A3Offset too high
+   - But handover NOT triggered -> A3Offset too high
    - Fix: Decrease A3 Offset for the serving cell
 
 2. **Interference / SINR problem**:
    - Symptom: SINR < 0 dB during degradation, strong interfering neighbour visible
    - Check if neighbour RSRP > serving RSRP by >= (A3Offset + A3Hyst) in dB
-   - If difference exactly equals threshold (not strictly greater) → HO not triggered
+   - If difference exactly equals threshold (not strictly greater) -> HO not triggered
    - Fix: Decrease A3 Offset for serving cell OR decrease tilt to shrink overlap
 
 3. **Coverage hole**:
@@ -87,12 +89,12 @@ SYSTEM_PROMPT = """You are an expert 5G network troubleshooting engineer with de
 
 6. **Azimuth / tilt misalignment**:
    - Use calculate_horizontal_angle and judge_mainlobe_or_not tools
-   - If UE is outside main-lobe → adjust azimuth
-   - If overlap too large → press down tilt
+   - If UE is outside main-lobe -> adjust azimuth
+   - If overlap too large -> press down tilt
 
 7. **PDCCH overhead**:
    - PdcchOccupiedSymbolNum 2SYM reduces user-plane throughput
-   - Only recommend 1SYM→2SYM if scheduling bottleneck confirmed
+   - Only recommend 1SYM->2SYM if scheduling bottleneck confirmed
 
 8. **Test server / transmission issue**:
    - Recommend C_check_server only if ALL cells in area show degradation simultaneously
@@ -103,14 +105,14 @@ SYSTEM_PROMPT = """You are an expert 5G network troubleshooting engineer with de
 - Then get_serving_cell_pci at the worst throughput timestamp
 - Then get_cell_info for that PCI
 - Then get_serving_cell_rsrp and get_serving_cell_sinr at degradation time
-- If SINR is poor → get_neighboring_cells_pci → get_neighboring_cell_rsrp for each
+- If SINR is poor -> get_neighboring_cells_pci -> get_neighboring_cell_rsrp for each
 - Use geometry tools (calculate_horizontal_angle, judge_mainlobe_or_not) when azimuth/tilt is suspected
 - Stop calling tools once root cause is confirmed — do not make unnecessary calls
 
 ## Answer Format
 - Single-answer: \\boxed{C<N>}
-- Multi-answer: \\boxed{C<N>|C<M>} in ascending order
-- NEVER output two boxed answers
+- Multi-answer: \\boxed{C<N>|C<M>} in ascending order, e.g. \\boxed{C3|C7}
+- NEVER output two separate boxed answers
 - NEVER output \\boxed{} without a valid C-number inside
 
 ## IMPORTANT — Tool Call Format
@@ -166,6 +168,29 @@ class Environment:
         self.timeout = timeout
         self.logger = logger if logger is not None else init_logger()
 
+    def health_check(self) -> bool:
+        """Verify the Tool Server is reachable before starting the benchmark."""
+        url = f"{self.server_url}/health"
+        try:
+            resp = requests.get(url, timeout=5.0)
+            if resp.status_code == 200:
+                self.logger.info(f"Tool Server health check PASSED: {url}")
+                return True
+            else:
+                self.logger.error(
+                    f"Tool Server health check FAILED (HTTP {resp.status_code}): {url}\n"
+                    f"Make sure the server is running: cd 'challenge_files/Track A' && "
+                    f"uvicorn server:app --host 0.0.0.0 --port 7860"
+                )
+                return False
+        except Exception as e:
+            self.logger.error(
+                f"Tool Server is NOT reachable at {url}: {e}\n"
+                f"Start the server first: cd 'challenge_files/Track A' && "
+                f"uvicorn server:app --host 0.0.0.0 --port 7860"
+            )
+            return False
+
     def _headers(self, scenario_id: Optional[str] = None) -> Dict[str, str]:
         headers = {"Content-Type": "application/json"}
         if scenario_id:
@@ -194,12 +219,14 @@ class Environment:
     def get_tools(self) -> List[Dict]:
         tools = self._call_api("get_available_tools")
         if isinstance(tools, dict) and "error" in tools:
+            self.logger.error(f"get_tools() failed: {tools['error']}")
             return []
         return tools if isinstance(tools, list) else []
 
     def get_scenarios(self) -> List[Dict]:
         scenarios = self._call_api("get_all_scenario")
         if isinstance(scenarios, dict) and "error" in scenarios:
+            self.logger.error(f"get_scenarios() failed: {scenarios['error']}")
             return []
         return scenarios if isinstance(scenarios, list) else []
 
@@ -231,13 +258,13 @@ def time_discount(elapsed_seconds: float) -> str:
 
 
 # ---------------------------------------------------------------------------
-# [FIX] Proactive rate limiter — stays under OpenRouter free-tier cap
+# Proactive rate limiter — stays under OpenRouter free-tier cap
 # ---------------------------------------------------------------------------
 
 class RateLimiter:
-    """Token-bucket rate limiter. Default: 18 req/min (under Gemma free 20/min cap)."""
+    """Token-bucket rate limiter. Default: 9 req/min (under Qwen3 free 10/min cap)."""
 
-    def __init__(self, max_per_minute: int = 18):
+    def __init__(self, max_per_minute: int = 9):
         self.min_interval = 60.0 / max_per_minute
         self.last_call_time = 0.0
         self._lock = threading.Lock()
@@ -249,15 +276,18 @@ class RateLimiter:
                 time.sleep(self.min_interval - elapsed)
             self.last_call_time = time.time()
 
+
 # ---------------------------------------------------------------------------
-# [FIX] Model Rotator — in case of persistent 429s, rotate through multiple free models
+# Model Rotator — rotates through fallback models on persistent 429s
+# Primary: Qwen3-235B-A22B (ITU-suggested model)
+# Fallbacks: Gemma4, Llama4 Maverick, Mistral Small, DeepSeek R1
 # ---------------------------------------------------------------------------
 FREE_MODEL_ROTATION = [
-    "google/gemma-4-26b-a4b-it:free",
-    "meta-llama/llama-4-maverick:free",
-    "mistralai/mistral-small-3.2-24b-instruct:free",
-    "deepseek/deepseek-r1-0528:free",
-    "qwen/qwen3-235b-a22b:free",
+    "qwen/qwen3-235b-a22b:free",            # ITU-suggested primary
+    "google/gemma-4-26b-a4b-it:free",       # fallback 1
+    "meta-llama/llama-4-maverick:free",     # fallback 2
+    "mistralai/mistral-small-3.2-24b-instruct:free",  # fallback 3
+    "deepseek/deepseek-r1-0528:free",       # fallback 4
 ]
 
 class ModelRotator:
@@ -296,7 +326,7 @@ class AgentsRunner:
         max_iterations: int = 10,
         verbose: bool = False,
         logger: logging.Logger = None,
-        rate_limit_per_minute: int = 18,
+        rate_limit_per_minute: int = 9,
     ):
         self.environment = environment
         self.model_url = model_url
@@ -308,20 +338,14 @@ class AgentsRunner:
         self.verbose = verbose
         self.logger = logger if logger is not None else init_logger()
 
-        # [FIX] Proactive throttle — fire before every LLM call
         self._rate_limiter = RateLimiter(max_per_minute=rate_limit_per_minute)
         self._rotator = ModelRotator(FREE_MODEL_ROTATION)
-        
+
         self.client = OpenAI(
             base_url=model_url,
             api_key=API_KEY,
             http_client=httpx.Client(verify=False),
         )
-
-    def _model_name_str(self) -> str:
-        if self.model_provider:
-            return f"{self.model_provider}/{self.model_name}"
-        return self.model_name
 
     def _call_model(self, messages: List[Dict], functions: List[Dict], **kwargs):
         call_kwargs = {
@@ -333,6 +357,11 @@ class AgentsRunner:
             call_kwargs["tools"] = functions
             call_kwargs["tool_choice"] = "auto"
 
+        # Disable Qwen3 extended thinking to save tokens and speed up inference
+        current_primary = self._rotator.current()
+        if "qwen3" in current_primary.lower() or "qwen/qwen3" in current_primary.lower():
+            call_kwargs["extra_body"] = {"thinking": False}
+
         base_wait = 8.0
         consecutive_429s = 0
 
@@ -341,6 +370,12 @@ class AgentsRunner:
 
             current_model = self._rotator.current()
             call_kwargs["model"] = current_model
+
+            # Keep thinking=False only for Qwen3 models
+            if "qwen3" in current_model.lower() or "qwen/qwen3" in current_model.lower():
+                call_kwargs["extra_body"] = {"thinking": False}
+            else:
+                call_kwargs.pop("extra_body", None)
 
             try:
                 response = self.client.chat.completions.create(**call_kwargs)
@@ -417,7 +452,6 @@ class AgentsRunner:
         options = task.get("options", [])
         root_causes = "".join([f"{item['id']}:{item['label']}\n" for item in options])
 
-        # Detect multi-answer questions from description
         description = task.get("description", "")
         is_multi = "select" in description.lower() and any(
             kw in description.lower() for kw in ["two", "three", "four", "multiple", "2", "3", "4"]
@@ -425,10 +459,14 @@ class AgentsRunner:
 
         tool_defs = self.environment.get_tools()
         if not tool_defs:
+            self.logger.error(
+                f"[Scenario: {scenario_id}] No tools returned from server. "
+                f"Is the Tool Server running at {self.environment.server_url}?"
+            )
             return {
                 "scenario_id": scenario_id,
                 "status": "unresolved",
-                "reason": "No tools available",
+                "reason": "No tools available — Tool Server may be down",
                 "answer": "",
                 "traces": "",
                 "tool_calls": [],
@@ -454,7 +492,9 @@ class AgentsRunner:
 
             msg = self._call_model(messages, functions=tool_defs)
             if msg is None:
-                self.logger.warning(f"[Scenario: {scenario_id}] _call_model returned None at round {i+1} — skipping")
+                self.logger.warning(
+                    f"[Scenario: {scenario_id}] _call_model returned None at round {i+1} — skipping"
+                )
                 continue
 
             last_msg = msg
@@ -488,7 +528,6 @@ class AgentsRunner:
                         "results": tool_result,
                     })
 
-                # Early-stop: if assistant already stated a boxed answer alongside tool calls
                 if msg.content:
                     early = extract_answer_all(msg.content)
                     if early:
@@ -497,13 +536,11 @@ class AgentsRunner:
                         break
 
             elif msg.content:
-                # No more tool calls — check if answer is present
                 answer_candidate = extract_answer_all(msg.content)
                 if answer_candidate:
                     status = "solved"
                     break
                 else:
-                    # Content present but no boxed answer yet — force it
                     if free_mode:
                         forced = self._force_answer(messages, root_causes, is_multi)
                         if forced is not None:
@@ -520,7 +557,6 @@ class AgentsRunner:
         if status is None:
             status = "unresolved"
 
-        # Final safety net: if still no boxed answer, force one
         final_content = getattr(last_msg, "content", "") or ""
         final_traces = getattr(last_msg, "reasoning_content", "") or ""
         agent_answer = extract_answer_all(final_content) or extract_answer_all(final_traces)
@@ -613,7 +649,6 @@ class AgentsRunner:
                 "latency": latency,
             })
 
-            # result.csv row: use first attempt answer
             save_result.append({
                 "scenario_id": scenario_id,
                 "answers": agent_answers[0] if agent_answers else "",
@@ -624,7 +659,6 @@ class AgentsRunner:
                 df.to_csv(os.path.join(save_dir, "result.csv"), index=False)
                 self.logger.info(f"Saved result.csv ({idx + 1}/{len(scenarios)} scenarios done)")
 
-        # Final completions dump (detailed)
         completions_path = os.path.join(save_dir, "completions.json")
         with open(completions_path, "w", encoding="utf-8") as f:
             json.dump(completions, f, ensure_ascii=False, indent=2)
@@ -636,11 +670,11 @@ class AgentsRunner:
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Track A — Enhanced ReAct Agent")
+    parser = argparse.ArgumentParser(description="Track A — Enhanced ReAct Agent (Qwen3-235B primary)")
     parser.add_argument("--server_url", type=str, default="http://localhost:7860")
     parser.add_argument("--model_url", type=str, default="https://openrouter.ai/api/v1")
-    # [FIX] Default model changed to Gemma 4 26B A4B free — 20 req/min, 262K context, 7 providers
-    parser.add_argument("--model_name", type=str, default="google/gemma-4-26b-a4b-it:free")
+    # ITU-suggested model: Qwen3-235B-A22B via OpenRouter free tier
+    parser.add_argument("--model_name", type=str, default="qwen/qwen3-235b-a22b:free")
     parser.add_argument("--model_provider", type=str, default=None)
     parser.add_argument("--num_attempts", type=int, default=1)
     parser.add_argument("--max_samples", type=int, default=None)
@@ -649,9 +683,9 @@ if __name__ == "__main__":
     parser.add_argument("--max_iterations", type=int, default=10)
     parser.add_argument("--save_dir", type=str, default="./results")
     parser.add_argument("--log_file", type=str, default="./log.log")
-    # [FIX] Exposed rate limit as CLI arg — set lower if still hitting 429s
-    parser.add_argument("--rate_limit_per_minute", type=int, default=18,
-                        help="Max LLM requests per minute (default 18, under Gemma free 20/min cap)")
+    # Qwen3 free tier: 10 req/min — use 9 to stay safely under
+    parser.add_argument("--rate_limit_per_minute", type=int, default=9,
+                        help="Max LLM requests per minute (default 9, under Qwen3 free 10/min cap)")
     parser.add_argument("--no_free_mode", action="store_true", help="Disable free_mode (not recommended)")
     parser.add_argument("--verbose", action="store_true")
     args = parser.parse_args()
@@ -659,6 +693,11 @@ if __name__ == "__main__":
     logger = init_logger(log_file=args.log_file)
 
     env = Environment(server_url=args.server_url, verbose=args.verbose, logger=logger)
+
+    # [FIX] Health-check before starting — fail fast with actionable error message
+    if not env.health_check():
+        logger.error("Aborting: Tool Server is not reachable. See above for startup instructions.")
+        sys.exit(1)
 
     runner = AgentsRunner(
         environment=env,
