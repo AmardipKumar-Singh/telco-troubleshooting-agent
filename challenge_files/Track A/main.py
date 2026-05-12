@@ -10,12 +10,13 @@ Key improvements:
   4. Parallel-safe tool dispatch (sequential but compact)
   5. Strict answer formatting guard before saving result.csv
   6. Timeout-aware: tracks wall-clock time per scenario, logs discount tier
-  7. [FIX] Primary model: qwen/qwen3-235b-a22b:free (ITU-suggested)
-  8. [FIX] Proactive rate limiter (9 req/min) under Qwen3 free 10/min cap
+  7. [FIX] Primary model: qwen/qwen3.6-plus:free (1M ctx, Qwen flagship May 2026)
+  8. [FIX] Proactive rate limiter (18 req/min) under free 20/min cap
   9. [FIX] Exponential backoff with 8s base delay for 429s
  10. [FIX] None/empty response guard on response.choices before indexing
  11. [FIX] Server health-check on startup — clear error if server not running
- 12. [FIX] Model rotation fallback: Gemma -> Llama4 -> Mistral -> DeepSeek
+ 12. [FIX] Model rotation fallback: Gemma4 -> Llama4 -> Mistral -> DeepSeek
+ 13. [FIX] 404 NotFoundError caught and triggers immediate model rotation
 """
 
 import argparse
@@ -32,7 +33,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import httpx
 import pandas as pd
 import requests
-from openai import OpenAI, RateLimitError, APIConnectionError, APITimeoutError, APIError
+from openai import OpenAI, RateLimitError, APIConnectionError, APITimeoutError, APIError, NotFoundError
 
 from _types import ToolCall
 from logger import init_logger
@@ -169,7 +170,6 @@ class Environment:
         self.logger = logger if logger is not None else init_logger()
 
     def health_check(self) -> bool:
-        """Verify the Tool Server is reachable before starting the benchmark."""
         url = f"{self.server_url}/health"
         try:
             resp = requests.get(url, timeout=5.0)
@@ -179,15 +179,13 @@ class Environment:
             else:
                 self.logger.error(
                     f"Tool Server health check FAILED (HTTP {resp.status_code}): {url}\n"
-                    f"Make sure the server is running: cd 'challenge_files/Track A' && "
-                    f"uvicorn server:app --host 0.0.0.0 --port 7860"
+                    f"Start: cd 'challenge_files/Track A' && python -m uvicorn server:app --host 0.0.0.0 --port 7860"
                 )
                 return False
         except Exception as e:
             self.logger.error(
-                f"Tool Server is NOT reachable at {url}: {e}\n"
-                f"Start the server first: cd 'challenge_files/Track A' && "
-                f"uvicorn server:app --host 0.0.0.0 --port 7860"
+                f"Tool Server NOT reachable at {url}: {e}\n"
+                f"Start: python -m uvicorn server:app --host 0.0.0.0 --port 7860"
             )
             return False
 
@@ -258,13 +256,13 @@ def time_discount(elapsed_seconds: float) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Proactive rate limiter — stays under OpenRouter free-tier cap
+# Proactive rate limiter
 # ---------------------------------------------------------------------------
 
 class RateLimiter:
-    """Token-bucket rate limiter. Default: 9 req/min (under Qwen3 free 10/min cap)."""
+    """Token-bucket rate limiter. Default: 18 req/min (under free 20/min cap)."""
 
-    def __init__(self, max_per_minute: int = 9):
+    def __init__(self, max_per_minute: int = 18):
         self.min_interval = 60.0 / max_per_minute
         self.last_call_time = 0.0
         self._lock = threading.Lock()
@@ -278,20 +276,19 @@ class RateLimiter:
 
 
 # ---------------------------------------------------------------------------
-# Model Rotator — rotates through fallback models on persistent 429s
-# Primary: Qwen3-235B-A22B (ITU-suggested model)
-# Fallbacks: Gemma4, Llama4 Maverick, Mistral Small, DeepSeek R1
+# Model Rotator
+# Primary: qwen/qwen3.6-plus:free  (ITU Qwen suggestion, 1M ctx, free May 2026)
+# Fallbacks in order if 404/429 encountered
 # ---------------------------------------------------------------------------
 FREE_MODEL_ROTATION = [
-    "qwen/qwen3-235b-a22b:free",            # ITU-suggested primary
-    "google/gemma-4-26b-a4b-it:free",       # fallback 1
-    "meta-llama/llama-4-maverick:free",     # fallback 2
-    "mistralai/mistral-small-3.2-24b-instruct:free",  # fallback 3
-    "deepseek/deepseek-r1-0528:free",       # fallback 4
+    "qwen/qwen3.6-plus:free",                             # primary
+    "google/gemma-4-26b-a4b-it:free",                    # fallback 1
+    "meta-llama/llama-4-maverick:free",                  # fallback 2
+    "mistralai/mistral-small-3.2-24b-instruct:free",     # fallback 3
+    "deepseek/deepseek-r1-0528:free",                    # fallback 4
 ]
 
 class ModelRotator:
-    """Rotates through free models when a provider is saturated."""
     def __init__(self, models: List[str]):
         self.models = models
         self._index = 0
@@ -326,7 +323,7 @@ class AgentsRunner:
         max_iterations: int = 10,
         verbose: bool = False,
         logger: logging.Logger = None,
-        rate_limit_per_minute: int = 9,
+        rate_limit_per_minute: int = 18,
     ):
         self.environment = environment
         self.model_url = model_url
@@ -357,12 +354,8 @@ class AgentsRunner:
             call_kwargs["tools"] = functions
             call_kwargs["tool_choice"] = "auto"
 
-        # Disable Qwen3 extended thinking to save tokens and speed up inference
-        current_primary = self._rotator.current()
-        if "qwen3" in current_primary.lower() or "qwen/qwen3" in current_primary.lower():
-            call_kwargs["extra_body"] = {"thinking": False}
-
         base_wait = 8.0
+        consecutive_404s = 0
         consecutive_429s = 0
 
         for attempt in range(1, self.max_retries + 1):
@@ -370,12 +363,6 @@ class AgentsRunner:
 
             current_model = self._rotator.current()
             call_kwargs["model"] = current_model
-
-            # Keep thinking=False only for Qwen3 models
-            if "qwen3" in current_model.lower() or "qwen/qwen3" in current_model.lower():
-                call_kwargs["extra_body"] = {"thinking": False}
-            else:
-                call_kwargs.pop("extra_body", None)
 
             try:
                 response = self.client.chat.completions.create(**call_kwargs)
@@ -387,19 +374,31 @@ class AgentsRunner:
 
                 self._rotator.reset()
                 consecutive_429s = 0
+                consecutive_404s = 0
                 return response.choices[0].message
+
+            except NotFoundError:
+                # Model has no active endpoints — rotate immediately
+                next_model = self._rotator.rotate()
+                self.logger.warning(
+                    f"404 No endpoints for {current_model} — rotating to {next_model}"
+                )
+                consecutive_404s += 1
+                if consecutive_404s >= len(FREE_MODEL_ROTATION):
+                    self.logger.error("All models returned 404. Check OpenRouter model availability.")
+                    return None
+                time.sleep(2.0)
+                continue
 
             except RateLimitError:
                 consecutive_429s += 1
                 if attempt == self.max_retries:
-                    self.logger.error(f"Exhausted all {self.max_retries} retries across models")
+                    self.logger.error(f"Exhausted all {self.max_retries} retries")
                     return None
-
                 if consecutive_429s >= 2:
                     next_model = self._rotator.rotate()
                     self.logger.warning(
-                        f"Provider saturated for {current_model} — rotating to {next_model} "
-                        f"(attempt {attempt}/{self.max_retries})"
+                        f"Provider saturated for {current_model} — rotating to {next_model}"
                     )
                     consecutive_429s = 0
                     time.sleep(3.0)
@@ -415,7 +414,10 @@ class AgentsRunner:
                 if self.verbose:
                     self.logger.error(traceback.format_exc())
                 if hasattr(exc, "status_code") and 400 <= exc.status_code < 500 and exc.status_code != 429:
-                    return None
+                    next_model = self._rotator.rotate()
+                    self.logger.warning(f"HTTP {exc.status_code} on {current_model} — rotating to {next_model}")
+                    time.sleep(2.0)
+                    continue
                 if attempt == self.max_retries:
                     return None
                 time.sleep(min(base_wait * (2 ** (attempt - 1)), 60.0))
@@ -427,10 +429,7 @@ class AgentsRunner:
 
         return None
 
-    def _force_answer(
-        self, messages: List[Dict], root_causes: str, is_multi: bool
-    ) -> Any:
-        """Issue a final no-tool prompt to force a boxed answer."""
+    def _force_answer(self, messages: List[Dict], root_causes: str, is_multi: bool) -> Any:
         if is_multi:
             constraint = (
                 "This is a MULTIPLE-answer question. Select two to four optimisation options. "
@@ -460,8 +459,7 @@ class AgentsRunner:
         tool_defs = self.environment.get_tools()
         if not tool_defs:
             self.logger.error(
-                f"[Scenario: {scenario_id}] No tools returned from server. "
-                f"Is the Tool Server running at {self.environment.server_url}?"
+                f"[Scenario: {scenario_id}] No tools returned. Is the Tool Server running?"
             )
             return {
                 "scenario_id": scenario_id,
@@ -475,7 +473,6 @@ class AgentsRunner:
             }
 
         question = description + f"\nOptions:\n{root_causes}"
-
         messages: List[Dict] = [
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": question},
@@ -492,9 +489,7 @@ class AgentsRunner:
 
             msg = self._call_model(messages, functions=tool_defs)
             if msg is None:
-                self.logger.warning(
-                    f"[Scenario: {scenario_id}] _call_model returned None at round {i+1} — skipping"
-                )
+                self.logger.warning(f"[Scenario: {scenario_id}] _call_model returned None at round {i+1}")
                 continue
 
             last_msg = msg
@@ -512,13 +507,10 @@ class AgentsRunner:
                 for j, tool_call in enumerate(msg.tool_calls):
                     if self.verbose:
                         print_tool_call(tool_call, logger=self.logger)
-
                     tool_result = self.environment.execute(tool_call, scenario_id=scenario_id)
                     messages.append({"role": "tool", "content": tool_result, "tool_call_id": tool_call.id})
-
                     if self.verbose:
                         print_tool_result(tool_result, logger=self.logger)
-
                     list_tool_calls.append({
                         "function_name": tool_call.function.name,
                         "arguments": tool_call.function.arguments,
@@ -527,14 +519,12 @@ class AgentsRunner:
                         "has_failed": "error" in tool_result,
                         "results": tool_result,
                     })
-
                 if msg.content:
                     early = extract_answer_all(msg.content)
                     if early:
-                        self.logger.info(f"[Scenario: {scenario_id}] Early answer detected: {early}")
+                        self.logger.info(f"[Scenario: {scenario_id}] Early answer: {early}")
                         status = "solved"
                         break
-
             elif msg.content:
                 answer_candidate = extract_answer_all(msg.content)
                 if answer_candidate:
@@ -562,7 +552,7 @@ class AgentsRunner:
         agent_answer = extract_answer_all(final_content) or extract_answer_all(final_traces)
 
         if not agent_answer and free_mode and last_msg is not None:
-            self.logger.info(f"[Scenario: {scenario_id}] No boxed answer found — forcing final answer prompt")
+            self.logger.info(f"[Scenario: {scenario_id}] No boxed answer — forcing final prompt")
             forced = self._force_answer(messages, root_causes, is_multi)
             if forced is not None:
                 last_msg = forced
@@ -590,7 +580,6 @@ class AgentsRunner:
         free_mode: bool = True,
     ) -> None:
         os.makedirs(save_dir, exist_ok=True)
-
         completions: List[Dict] = []
         save_result: List[Dict] = []
 
@@ -603,7 +592,6 @@ class AgentsRunner:
         for idx, scenario in enumerate(scenarios):
             scenario_id = scenario.get("scenario_id")
             start_time = time.time()
-
             n_success = 0.0
             agent_answers: List[str] = []
             sample_response: Dict = {}
@@ -670,11 +658,10 @@ class AgentsRunner:
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Track A — Enhanced ReAct Agent (Qwen3-235B primary)")
+    parser = argparse.ArgumentParser(description="Track A — ReAct Agent (Qwen3.6-Plus primary)")
     parser.add_argument("--server_url", type=str, default="http://localhost:7860")
     parser.add_argument("--model_url", type=str, default="https://openrouter.ai/api/v1")
-    # ITU-suggested model: Qwen3-235B-A22B via OpenRouter free tier
-    parser.add_argument("--model_name", type=str, default="qwen/qwen3-235b-a22b:free")
+    parser.add_argument("--model_name", type=str, default="qwen/qwen3.6-plus:free")
     parser.add_argument("--model_provider", type=str, default=None)
     parser.add_argument("--num_attempts", type=int, default=1)
     parser.add_argument("--max_samples", type=int, default=None)
@@ -683,20 +670,16 @@ if __name__ == "__main__":
     parser.add_argument("--max_iterations", type=int, default=10)
     parser.add_argument("--save_dir", type=str, default="./results")
     parser.add_argument("--log_file", type=str, default="./log.log")
-    # Qwen3 free tier: 10 req/min — use 9 to stay safely under
-    parser.add_argument("--rate_limit_per_minute", type=int, default=9,
-                        help="Max LLM requests per minute (default 9, under Qwen3 free 10/min cap)")
-    parser.add_argument("--no_free_mode", action="store_true", help="Disable free_mode (not recommended)")
+    parser.add_argument("--rate_limit_per_minute", type=int, default=18)
+    parser.add_argument("--no_free_mode", action="store_true")
     parser.add_argument("--verbose", action="store_true")
     args = parser.parse_args()
 
     logger = init_logger(log_file=args.log_file)
-
     env = Environment(server_url=args.server_url, verbose=args.verbose, logger=logger)
 
-    # [FIX] Health-check before starting — fail fast with actionable error message
     if not env.health_check():
-        logger.error("Aborting: Tool Server is not reachable. See above for startup instructions.")
+        logger.error("Aborting: Tool Server is not reachable.")
         sys.exit(1)
 
     runner = AgentsRunner(

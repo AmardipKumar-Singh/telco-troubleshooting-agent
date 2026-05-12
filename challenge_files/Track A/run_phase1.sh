@@ -43,13 +43,11 @@ if curl -s --max-time 2 "$SERVER_URL/health" > /dev/null 2>&1; then
     echo "[INFO] Tool Server already running at $SERVER_URL"
 else
     echo "[INFO] Starting Tool Server at $SERVER_URL ..."
-    # Use python -m uvicorn so the venv uvicorn is always used
     DATA_SOURCE=data/Phase_1 DATA_SPLIT=test \
         "$PYTHON" -m uvicorn server:app --host 0.0.0.0 --port 7860 &
     SERVER_PID=$!
     echo "[INFO] Tool Server PID: $SERVER_PID"
 
-    # Wait for server to be ready (up to 40s)
     echo "[INFO] Waiting for Tool Server to be ready..."
     for i in $(seq 1 20); do
         if curl -s --max-time 2 "$SERVER_URL/health" > /dev/null 2>&1; then
@@ -60,7 +58,6 @@ else
         sleep 2
     done
 
-    # Final check
     if ! curl -s --max-time 2 "$SERVER_URL/health" > /dev/null 2>&1; then
         echo "ERROR: Tool Server failed to start. Check logs above."
         exit 1
@@ -68,18 +65,20 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-# 4. Run the agent benchmark (Phase 1 — all 500 scenarios)
+# 4. Run the agent benchmark
+# Primary model: qwen/qwen3.6-plus:free (1M context, free, Qwen flagship May 2026)
+# Fallback rotation: Gemma4 -> Llama4 Maverick -> Mistral Small -> DeepSeek R1
 # ---------------------------------------------------------------------------
-echo "[INFO] Starting agent benchmark with Qwen3-235B-A22B..."
+echo "[INFO] Starting agent benchmark with Qwen3.6-Plus (free)..."
 echo "[INFO] Results will be saved to: $SCRIPT_DIR/results/result.csv"
 
 "$PYTHON" main.py \
     --server_url "$SERVER_URL" \
     --model_url "https://openrouter.ai/api/v1" \
-    --model_name "qwen/qwen3-235b-a22b:free" \
+    --model_name "qwen/qwen3.6-plus:free" \
     --max_iterations 10 \
     --max_tokens 16000 \
-    --rate_limit_per_minute 9 \
+    --rate_limit_per_minute 18 \
     --save_dir ./results \
     --save_freq 10 \
     --log_file ./log.log \
