@@ -1,5 +1,9 @@
 fastapi
-openai
+uvicorn[standard]
+openai>=1.30.0
+httpx
 pydantic
 pandas
+numpy
+requests
 datasets
