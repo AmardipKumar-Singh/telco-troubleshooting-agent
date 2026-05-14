@@ -25,10 +25,8 @@ from datetime import datetime
 # Default input JSON file path
 DEFAULT_INPUT_JSON = "questions.json"
 
-# OPENCLAW_DIR = r"D:\PycharmProjects\openclaw"
-OPENCLAW_DIR = r""
-# OPENCLAW_SESSION_DIR = r"C:\Users\y00633222\.openclaw\agents\main\sessions"
-OPENCLAW_SESSION_DIR = r""
+OPENCLAW_DIR = r"/opt/homebrew/lib/node_modules/openclaw"
+OPENCLAW_SESSION_DIR = r"/Users/amardip/.openclaw/agents/main/sessions"
 FORCE_KILL_TIMEOUT = 600  # Force kill timeout per question (10 minutes)
 DEFAULT_CONCURRENCY = 2
 
@@ -286,7 +284,6 @@ def save_progress(progress: dict):
 def init_csv():
     """Initialize CSV file and write header"""
     if not os.path.exists(RESULT_CSV):
-        # Use utf-8-sig to prevent character encoding issues in Excel
         with open(RESULT_CSV, "w", newline="", encoding="utf-8-sig") as f:
             writer = csv.writer(f)
             writer.writerow(["id", "prediction"])
@@ -331,7 +328,6 @@ def evaluate(input_file: str, resume: bool, concurrency: int, specific_ids: list
     questions = load_questions_from_file(input_file)
     log.info(f"Successfully loaded {len(questions)} questions.")
 
-    # Filter by specific IDs if provided
     if specific_ids:
         todo = [qid for qid in questions.keys() if qid in specific_ids and qid not in completed_set]
     else:
@@ -362,10 +358,8 @@ def evaluate(input_file: str, resume: bool, concurrency: int, specific_ids: list
                 log.warning(
                     f"  [#{qid}] ✗ Execution failed (took {duration_s:.1f}s): {result['error']} [{finished_count}/{total}]")
 
-            # Write result to CSV
             append_to_csv(qid, extracted)
 
-            # Record detailed log
             detail_entry = {
                 "question_id": qid,
                 "session_id": result.get("session_id", ""),
@@ -378,11 +372,9 @@ def evaluate(input_file: str, resume: bool, concurrency: int, specific_ids: list
             detail_f.write(json.dumps(detail_entry, ensure_ascii=False) + "\n")
             detail_f.flush()
 
-            # Update progress
             progress["completed"].append(qid)
             save_progress(progress)
 
-    # Execute inference
     if concurrency <= 1:
         for idx, qid in enumerate(todo):
             log.info(f"[{idx + 1}/{total}] Executing question #{qid} ...")
